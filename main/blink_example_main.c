@@ -99,6 +99,6 @@ void app_main(void)
         blink_led();
         /* Toggle the LED state */
         s_led_state = !s_led_state;
-        vTaskDelay(400 / portTICK_PERIOD_MS);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
