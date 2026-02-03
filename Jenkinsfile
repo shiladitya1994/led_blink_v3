@@ -15,7 +15,7 @@ pipeline {
         stage('ESP-IDF Build') {
             steps {
                 sh '''
-                    sudo podman run --rm \
+                    podman run --rm \
                     --userns=host \
                       -v "$PWD:/project" \
                       -w /project \
