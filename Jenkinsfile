@@ -16,6 +16,7 @@ pipeline {
             steps {
                 sh '''
                     podman run --rm \
+                    --userns=host \
                       -v "$PWD:/project" \
                       -w /project \
                       ${ESP_IDF_IMAGE} \
