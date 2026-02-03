@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        ESP_IDF_IMAGE = "docker.io/espressif/idf:v5.1"
+        ESP_IDF_IMAGE = "docker.io/espressif/idf:v5.5.2"
     }
 
     stages {
