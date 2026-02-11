@@ -1,45 +1,42 @@
 pipeline {
-  agent any
-  options { skipDefaultCheckout(true) }
+    agent any
 
-  environment {
-    ESP_IDF_IMAGE = 'docker.io/espressif/idf:v5.5.2'
-  }
+    stages {
 
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Firmware (Windows Native)') {
+            steps {
+                bat '''
+                echo ===============================
+                echo Loading ESP-IDF Environment
+                echo ===============================
+
+                call C:\\Espressif\\frameworks\\esp-idf-v5.5.2\\export.bat
+
+                idf.py --version
+                idf.py build
+                '''
+            }
+        }
+
+        stage('Archive Firmware') {
+            steps {
+                archiveArtifacts artifacts: 'build\\*.bin, build\\*.elf, build\\*.map', fingerprint: true
+            }
+        }
     }
 
-    stage('ESP-IDF Build (Windows + Podman)') {
-      steps {
-        powershell '''
-          $ErrorActionPreference = "Stop"
-
-          # Verify podman is available
-          podman --version
-
-          # Run the ESP-IDF container, mount the workspace, and build
-          podman run --rm `
-            -v "$PWD:/project" `
-            -w /project `
-            ${env:ESP_IDF_IMAGE} `
-            bash -lc "source /opt/esp/idf/export.sh && idf.py --version && idf.py set-target esp32 && idf.py build"
-        '''
-      }
+    post {
+        success {
+            echo 'Build succeeded'
+        }
+        failure {
+            echo 'Build failed'
+        }
     }
-
-    stage('Archive Artifacts') {
-      steps {
-        archiveArtifacts artifacts: 'build/**', fingerprint: true
-      }
-    }
-  }
-
-  post {
-    success { echo '✅ ESP-IDF build succeeded' }
-    failure { echo '❌ ESP-IDF build failed' }
-  }
 }
